@@ -37,8 +37,8 @@ def create_database():
 
 # Функция добавления записи в таблицу. Возвращает True, если запись была создана,
 # False, если такая запись уже существует
-def try_add_record(chat_id, token_0, token_1):
-    session.add(Record(chat_id=chat_id, token_0=token_0, token_1=token_1))
+def try_add_record(chat_id, token_0, token_1, num=1):
+    session.add(Record(chat_id=chat_id, token_0=token_0, token_1=token_1, num=num))
 
     try:
         session.commit()
@@ -48,7 +48,7 @@ def try_add_record(chat_id, token_0, token_1):
         return False
 
 
-# Функция изменения в записи поля num. Возвращает True, если запись была изменена,
+# Функция изменения в записи поля 'num'. Возвращает True, если запись была изменена,
 # False, если записи не существует
 def try_set_num(chat_id, token_0, token_1, new_num):
     try:
@@ -59,6 +59,22 @@ def try_set_num(chat_id, token_0, token_1, new_num):
         return False
 
     record.num = new_num
+
+    session.commit()
+    return True
+
+
+# Функция прибавления числа к полю 'num'. Возвращает True, если запись была изменена,
+# False, если записи не существует
+def try_increase_num(chat_id, token_0, token_1, add_to_num):
+    try:
+        record = session.query(Record).filter_by(chat_id=chat_id,
+                                                 token_0=token_0,
+                                                 token_1=token_1).one()
+    except NoResultFound:   # Если такой записи нет, вернуть False
+        return False
+
+    record.num += add_to_num
 
     session.commit()
     return True
