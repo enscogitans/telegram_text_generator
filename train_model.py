@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+import model_database as db
 
 
 # Наш алфавит и используемая кодировка
@@ -49,13 +50,14 @@ def count_words_and_pairs(bigrams):
 # Инициализация изменений нашей модели. По ключу хранится лист слов,
 # которые могут идти после него с указаним количества встречаний
 def initialise_changes(word_freq, pair_freq):
-    model = defaultdict(list)
+    changes = defaultdict(list)
     for (t0, t1), freq in pair_freq.items():
-        model[t0].append((t1, freq))
-    return model
+        changes[t0].append((t1, freq))
+    return changes
 
 
-def update_model(text):
+# Обновление базы данных. Сохранение в модель всех биграм из текста
+def update_model(chat_id, text):
     # Инициализация генератора биграмм
     tokens = token_generator(text)
     bigrams = bigram_generator(tokens)
@@ -63,5 +65,12 @@ def update_model(text):
     # Подсчёт количества слов и пар слов соответственно
     word_freq, pair_freq = count_words_and_pairs(bigrams)
 
-    # Инициализация нашей модели
-    model = initialise_changes(word_freq, pair_freq)
+    # Инициализация изменений нашей модели
+    changes = initialise_changes(word_freq, pair_freq)
+
+    # Сохранение изменений в базу данных
+    for token_0, changes_values in changes.items():
+        for (token_1, add_to_num) in changes_values:
+            success = db.try_increase_num(chat_id, token_0, token_1, add_to_num)
+            if not success:
+                db.try_add_record(chat_id, token_0, token_1, add_to_num)
