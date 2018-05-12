@@ -1,45 +1,11 @@
 import re
-import argparse
 from fractions import Fraction
 from collections import defaultdict
+
 
 # Наш алфавит и используемая кодировка
 alphabet = re.compile(u'[ёЁа-яА-Я0-9]+[-]?[ёЁа-яА-Я0-9]+|[.,?!;:]+')
 encode_type = 'utf-8'
-
-
-# Создание парсера
-def create_parser():
-    parser = argparse.ArgumentParser(
-        description='''Это программа для создания модели введённого текста.
-        Созданная модель в дальнейшем используется для генерации псевдотекста
-        программой generate.py'''
-    )
-    parser.add_argument('-id', '--input-dir',
-                        help='''Директория, в которой лежит коллекция документов.
-                        Если не указано, ввод текта осуществляется из консоли.
-                        В данном случае необходимо закончить ввод данных вводом
-                        строки: '////' '''
-                        )
-    parser.add_argument('-m', '--model', required=True,
-                        help='Путь к файлу, в который сохраняется модель')
-    parser.add_argument('-lc', '--lowercase', type=bool, default=False,
-                        help='Приводить тексты к lowercase')
-    return parser
-
-
-# Построчно генерирует строки из данного файла (stdin)
-def line_generator(file_path):
-    if file_path is not None:
-        with open(file_path, 'r', encoding=encode_type) as file:
-            for line in file:
-                yield str(bytes(line, encode_type).decode(encode_type))
-    else:
-        while True:
-            line = input()
-            if line == '////':
-                return
-            yield line
 
 
 # Обрабатывает строки, возвращая отдельные слова, согласованные
@@ -102,18 +68,14 @@ def save_model(model, model_path):
             model_file.write('\n')
 
 
-# Считывание аргументов
-parser = create_parser()
-args = parser.parse_args()
+def update_model(lines):
+    # Инициализация генератора биграмм
+    tokens = token_generator(lines)
+    bigrams = bigram_generator(tokens)
 
-# Инициализация генератора биграмм
-lines = line_generator(args.input_dir)
-tokens = token_generator(lines, args.lowercase)
-bigrams = bigram_generator(tokens)
+    # Подсчёт количества слов и пар слов соответственно
+    word_freq, pair_freq = count_words_and_pairs(bigrams)
 
-# Подсчёт количества слов и пар слов соответственно
-word_freq, pair_freq = count_words_and_pairs(bigrams)
-
-# Инициализация и сохранение нашей модели
-model = initialise_model(word_freq, pair_freq)
-save_model(model, args.model)
+    # Инициализация и сохранение нашей модели
+    model = initialise_model(word_freq, pair_freq)
+    save_model(model, args.model)
