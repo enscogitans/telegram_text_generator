@@ -31,6 +31,10 @@ def generate_text_for_chat(chat_id, length=None):
     prev_word = np.random.choice(model_words[''])
     result = prev_word
 
+    # Если это символ окончания сообщения, переобозначим prev_word
+    if re.fullmatch(r'[?!.]+', prev_word):
+        prev_word = ''
+
     # Генерация и вывод последующих слов
     for i in range(1, length):
         next_word = np.random.choice(model_words[prev_word],
