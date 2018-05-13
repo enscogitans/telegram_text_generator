@@ -3,51 +3,6 @@ import argparse
 import numpy as np
 from collections import defaultdict
 from fractions import Fraction
-import sys
-import contextlib
-
-encode_type = 'utf-8'  # Наша кодировка
-
-
-# Позволяет использовать конструкцию with open() as
-# не только при работе с файлами, но и при работе
-# со стандартным потоком вывода (при указании пустого
-# filename)
-@contextlib.contextmanager
-def my_open_output(filename=None):
-    if filename is not None:
-        fh = open(filename, 'w')
-    else:
-        fh = sys.stdout
-
-    try:
-        yield fh
-    finally:
-        if fh is not sys.stdout:
-            fh.close()
-
-
-# Создание парсера
-def create_parser():
-    parser = argparse.ArgumentParser(
-        description='''Это программа для генерации псевдотекста на основе
-        модели некоторого текста. Эта модель создаётся программой train.py'''
-    )
-    parser.add_argument('-m', '--model', required=True,
-                        help='Путь к файлу, из которого загружается модель'
-                        )
-    parser.add_argument('-s', '--seed',
-                        help='''Начальное слово. Если не указано, оно будет
-                        выбрано случайно'''
-                        )
-    parser.add_argument('-l', '--length', type=int, default=200,
-                        help='Длина генерируемого тектса. По умолчанию - 200'
-                        )
-    parser.add_argument('-o', '--output',
-                        help='''Файл, в который будет записан результат.
-                        Если не указан, результат выведется в консоль.'''
-                        )
-    return parser
 
 
 # Считывание данных из нашей модели. Возвращает отдельно слова и вероятности
@@ -106,10 +61,6 @@ def generate_and_print_text(model_words, model_probabilities, seed,
                 result_file.write(' ')
             result_file.write(next_word)
 
-
-# Считывание аргументов
-parser = create_parser()
-args = parser.parse_args()
 
 # Извлечение из модели слов и вероятностей
 model_words, model_probabilities = read_model_from_file(args.model)
