@@ -8,12 +8,12 @@ import model_database as db
 def read_model_from_chat(chat_id):
     # Считывание из БД
     model_words, model_nums = db.get_tokens_and_nums_for_chat(chat_id)
-    nums_total = db.get_sum_of_nums_for_chat(chat_id)
 
     # Рассчёт вероятностей
     model_probabilities = dict()
     for key, val in model_nums.items():
-        model_probabilities[key] = [Fraction(num, nums_total) for num in model_nums]
+        nums_total_for_token = db.get_sum_of_nums_for_token_in_chat(key, chat_id)
+        model_probabilities[key] = [Fraction(num, nums_total_for_token) for num in model_nums[key]]
 
     return model_words, model_probabilities
 
