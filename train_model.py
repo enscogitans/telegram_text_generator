@@ -16,11 +16,11 @@ def token_generator(text, is_lower=False):
 
 # По словам (токенам) возвращает биграммы
 def bigram_generator(tokens):
-    t0 = '&'
+    t0 = ''
     for t1 in tokens:
         yield t0, t1
         if re.fullmatch(r'[?!.]+', t1):
-            t0 = '&'
+            t0 = ''
         else:
             t0 = t1
 
@@ -30,19 +30,19 @@ def count_words_and_pairs(bigrams):
     word_freq = defaultdict(lambda: 0)
     pair_freq = defaultdict(lambda: 0)
 
-    last_symbol = '&'
-    word_freq['&'] = 1
+    last_symbol = ''
+    word_freq[''] = 1
     for (t0, t1) in bigrams:
         if re.fullmatch(r'[?!.]+', t1):
-            word_freq['&'] += 1
+            word_freq[''] += 1
         word_freq[t1] += 1
         pair_freq[(t0, t1)] += 1
         last_symbol = t1
 
     if re.fullmatch(r'[?!.]+', last_symbol):
-        pair_freq[('&', '&')] += 1
+        pair_freq[('', '')] += 1
     else:
-        pair_freq[(last_symbol, '&')] += 1
+        pair_freq[(last_symbol, '')] += 1
     return word_freq, pair_freq
 
 

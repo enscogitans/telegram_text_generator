@@ -28,7 +28,7 @@ def generate_text_for_chat(chat_id, length=None):
     model_words, model_probabilities = read_model_from_chat(chat_id)
 
     # Генерация первого слова
-    prev_word = np.random.choice(model_words['&'])
+    prev_word = np.random.choice(model_words[''])
     result = prev_word
 
     # Генерация и вывод последующих слов
@@ -41,7 +41,7 @@ def generate_text_for_chat(chat_id, length=None):
         is_space = False
         if re.fullmatch(r'[?!.]+', next_word):
             # Если точка и тп, пробел не нужен
-            prev_word = '&'
+            prev_word = ''
             is_space = False
         else:
             # Если не запятая и тп, пробел нужен
