@@ -1,9 +1,11 @@
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from collections import defaultdict
 
 
 # Родительский класс запсиси
@@ -78,3 +80,25 @@ def try_increase_num(chat_id, token_0, token_1, add_to_num):
 
     session.commit()
     return True
+
+
+# Функция, возвращающая сумму всех num для конкретного чата
+def get_sum_of_nums_for_chat(chat_id):
+    return session.query(func.sum(Record.num)).filter_by(chat_id=chat_id).one()[0]
+
+
+# Функция, возвращающая словари с токенами и количеством их встречаний.
+def get_tokens_and_nums_for_chat(chat_id):
+    #
+    lines = session.query(Record.token_0,
+                          Record.token_1,
+                          Record.num).filter_by(chat_id=chat_id).all()
+
+    tokens = defaultdict(list)
+    nums = defaultdict(list)
+
+    for line in lines:
+        tokens[line[0]].append(line[1])
+        nums[(line[0], line[1])].append(line[2])
+
+    return tokens, nums
