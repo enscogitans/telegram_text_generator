@@ -99,6 +99,6 @@ def get_tokens_and_nums_for_chat(chat_id):
 
     for line in lines:
         tokens[line[0]].append(line[1])
-        nums[(line[0], line[1])].append(line[2])
+        nums[line[0]].append(line[2])
 
     return tokens, nums
