@@ -2,6 +2,9 @@ import argparse
 import time
 import telepot
 from telepot.loop import MessageLoop
+import model_database as db
+import train_model
+import generate_text
 
 
 # Создание парсера
@@ -27,13 +30,23 @@ def create_bot(token, proxy=None):
 
 # Функция обработки сообщений
 def handle(msg):
-    bot.sendMessage(msg['chat']['id'], msg['text'])
+    content_type, chat_type, chat_id = telepot.glance(msg)
+
+    if content_type == 'text':
+        line = msg['text']
+
+        if line != '/generate':
+            train_model.update_model(chat_id, line)
+        else:
+            answer = generate_text.generate_text_for_chat(chat_id)
+            bot.sendMessage(chat_id, answer)
 
 
 if __name__ == '__main__':
     parser = create_parser()    # Парсер аргументов
     args = parser.parse_args()  # Аргументы, пришедшие от парсера
 
+    db.create_database()        # Создание базы, если не существует
     bot = create_bot(args.token, args.proxy)  # Наш бот
 
     # Запускаем бесконечный цикл обработки сообщений
