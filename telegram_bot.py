@@ -10,7 +10,7 @@ import generate_text
 # Создание парсера
 def create_parser():
     parser = argparse.ArgumentParser(
-        description='''Это очень интересное описание бота...'''
+        description='''Это программа для запуска бота'''
     )
     parser.add_argument('-t', '--token', required=True,
                         help='Токен вашего бота'
