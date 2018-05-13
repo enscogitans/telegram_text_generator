@@ -1,12 +1,19 @@
 import re
-import argparse
 import numpy as np
-from collections import defaultdict
 from fractions import Fraction
+import model_database as db
 
 
-# Считывание данных из нашей модели. Возвращает отдельно слова и вероятности
-def read_model_from_database():
+# Считывание данных чата из нашей модели. Возвращает отдельно слова и вероятности
+def read_model_from_chat(chat_id):
+    # Считывание из БД
+    model_words, model_nums = db.get_tokens_and_nums_for_chat(chat_id)
+    nums_total = db.get_sum_of_nums_for_chat(chat_id)
+
+    # Рассчёт вероятностей
+    model_probabilities = dict()
+    for key, val in model_nums.items():
+        model_probabilities[key] = [Fraction(num, nums_total) for num in model_nums]
 
     return model_words, model_probabilities
 
