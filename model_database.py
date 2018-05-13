@@ -82,7 +82,7 @@ def try_increase_num(chat_id, token_0, token_1, add_to_num):
     return True
 
 
-# Функция, возвращающая сумму всех num для конкретного чата
+# Функция, возвращающая сумму всех num для конкретного токена из чата
 def get_sum_of_nums_for_token_in_chat(token, chat_id):
     return session.query(func.sum(Record.num)).filter_by(chat_id=chat_id,
                                                          token_0=token).one()[0]
