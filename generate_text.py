@@ -22,7 +22,7 @@ def read_model_from_chat(chat_id):
 def generate_text_for_chat(chat_id, length=None):
     # Если длина не указана, выбирается случайно
     if length is None:
-        length = np.random.randint(10, 30)
+        length = np.random.randint(5, 15)
 
     # Считывание модели для данного чата
     model_words, model_probabilities = read_model_from_chat(chat_id)
