@@ -18,12 +18,20 @@ def read_model_from_chat(chat_id):
     return model_words, model_probabilities
 
 
-# Генерация текста и запись его в файл (в stdout)
-def generate_text_for_chat(chat_id, length):
-    # Считывание модели для данного чата
-    model_words, model_probabilities = read_model_from_database()
+# Генерация текста для чата
+def generate_text_for_chat(chat_id, length=None):
+    # Если длина не указана, выбирается случайно
+    if length is None:
+        length = np.random.randint(10, 30)
 
-    # Генерация и вывод слов
+    # Считывание модели для данного чата
+    model_words, model_probabilities = read_model_from_chat(chat_id)
+
+    # Генерация первого слова
+    prev_word = np.random.choice(model_words['&'])
+    result = prev_word
+
+    # Генерация и вывод последующих слов
     for i in range(1, length):
         next_word = np.random.choice(model_words[prev_word],
                                      p=model_probabilities[prev_word])
@@ -41,7 +49,9 @@ def generate_text_for_chat(chat_id, length):
                 is_space = True
             prev_word = next_word
 
-        # Вывод слова
+        # Добавление слова в результат
         if is_space:
-            result_file.write(' ')
-        result_file.write(next_word)
+            result += ' '
+        result += next_word
+
+    return result
