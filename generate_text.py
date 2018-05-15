@@ -4,7 +4,8 @@ from fractions import Fraction
 import model_database as db
 
 
-# Считывание данных чата из нашей модели. Возвращает отдельно слова и вероятности
+# Считывание данных чата из нашей модели.
+# Возвращает отдельно слова и вероятности
 def read_model_from_chat(chat_id):
     # Считывание из БД
     model_words, model_nums = db.get_tokens_and_nums_for_chat(chat_id)
@@ -12,13 +13,17 @@ def read_model_from_chat(chat_id):
     # Рассчёт вероятностей
     model_probabilities = dict()
     for key, val in model_nums.items():
-        nums_total_for_token = db.get_sum_of_nums_for_token_in_chat(key, chat_id)
-        model_probabilities[key] = [Fraction(num, nums_total_for_token) for num in model_nums[key]]
+        nums_total_for_token = \
+            db.get_sum_of_nums_for_token_in_chat(key, chat_id)
+
+        model_probabilities[key] = \
+            [Fraction(num, nums_total_for_token) for num in model_nums[key]]
 
     return model_words, model_probabilities
 
 
-# Генерация текста для чата
+# Генерация текста для чата. Возвращает текст в
+# случае непустой модели и None в противном случае
 def generate_text_for_chat(chat_id, length=None):
     # Если длина не указана, выбирается случайно
     if length is None:
@@ -26,6 +31,10 @@ def generate_text_for_chat(chat_id, length=None):
 
     # Считывание модели для данного чата
     model_words, model_probabilities = read_model_from_chat(chat_id)
+
+    # Проверка модели на пустоту. Если сообщений нет, то возвращается None
+    if not model_words:
+        return None
 
     # Генерация первого слова
     prev_word = np.random.choice(model_words[''])

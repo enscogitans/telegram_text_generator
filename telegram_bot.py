@@ -39,7 +39,11 @@ def handle(msg):
             train_model.update_model(chat_id, line)
         else:
             answer = generate_text.generate_text_for_chat(chat_id)
-            bot.sendMessage(chat_id, answer)
+            if answer is not None:
+                bot.sendMessage(chat_id, answer)
+            else:
+                bot.sendMessage(chat_id, 'Не могу сгенерировать текст: '
+                                'вы ещё ничего не отправили.')
 
 
 if __name__ == '__main__':
